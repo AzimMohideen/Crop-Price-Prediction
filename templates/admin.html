@@ -20,9 +20,32 @@
         </header>
         
         <main>
+            {% if not authenticated %}
+            <section class="admin-login">
+                <h2>Administration Login</h2>
+                <form method="POST" action="{{ url_for('admin_login') }}">
+                    <div class="form-group">
+                        <label for="password">Admin Password:</label>
+                        <input type="password" name="password" id="password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Login</button>
+                    
+                    {% if login_error %}
+                    <div class="error-message">
+                        {{ login_error }}
+                    </div>
+                    {% endif %}
+                </form>
+            </section>
+            {% else %}
             <section class="admin-panel">
                 <h2>Model Retraining</h2>
-                <form method="POST">
+                <div class="admin-welcome">
+                    <p>Welcome to the administration panel. Here you can retrain models and manage the system.</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('admin_retrain') }}">
                     <div class="form-group">
                         <label for="crop">Select Crop to Retrain:</label>
                         <select name="crop" id="crop" required>
@@ -40,7 +63,12 @@
                     {{ message }}
                 </div>
                 {% endif %}
+                
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin_logout') }}" class="btn btn-secondary">Logout</a>
+                </div>
             </section>
+            {% endif %}
         </main>
         
         <footer>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import numpy as np
 import pandas as pd
 import joblib
@@ -9,6 +9,10 @@ import os
 import json
 
 app = Flask(__name__)
+app.secret_key = 'crop_price_predictor_secret_key'  # Required for sessions
+
+# Admin credentials
+ADMIN_PASSWORD = "ccp2"
 
 # Get actual crop names from the models directory
 def get_crop_names():
@@ -471,35 +475,67 @@ def visualization(crop_name):
                           prediction_guide=prediction_guide,
                           importance_graph=importance_graph)
 
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/admin')
 def admin():
-    message = None
+    # Check if user is authenticated
+    authenticated = session.get('admin_authenticated', False)
     
-    if request.method == 'POST':
-        crop_name = request.form['crop']
-        try:
-            # Import the training function from train.py
-            from train import train_crop_model
-            
-            # Load the data for the specific crop
-            merged_data = pd.read_csv("merged.csv")
-            if 'Crop' in merged_data.columns:
-                crop_data = merged_data[merged_data['Crop'] == crop_name]
-            else:
-                crop_data = merged_data
-            
-            # Retrain the model
-            train_crop_model(crop_name, crop_data)
-            
-            # Reload the models
-            global models, thresholds, future_predictions, crop_names
-            models, thresholds, future_predictions, crop_names = load_models()
-            
-            message = f"Model for {crop_name} retrained successfully!"
-        except Exception as e:
-            message = f"Error retraining model: {str(e)}"
+    if authenticated:
+        return render_template('admin.html', 
+                              crops=crop_names, 
+                              authenticated=True,
+                              message=session.pop('admin_message', None))
+    else:
+        return render_template('admin.html', 
+                              authenticated=False,
+                              login_error=session.pop('login_error', None))
 
-    return render_template('admin.html', crops=crop_names, message=message)
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    password = request.form.get('password')
+    
+    if password == ADMIN_PASSWORD:
+        session['admin_authenticated'] = True
+        return redirect(url_for('admin'))
+    else:
+        session['login_error'] = "Invalid password. Please try again."
+        return redirect(url_for('admin'))
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_authenticated', None)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/retrain', methods=['POST'])
+def admin_retrain():
+    # Check if user is authenticated
+    if not session.get('admin_authenticated', False):
+        return redirect(url_for('admin'))
+    
+    crop_name = request.form['crop']
+    try:
+        # Import the training function from train.py
+        from train import train_crop_model
+        
+        # Load the data for the specific crop
+        merged_data = pd.read_csv("merged.csv")
+        if 'Crop' in merged_data.columns:
+            crop_data = merged_data[merged_data['Crop'] == crop_name]
+        else:
+            crop_data = merged_data
+        
+        # Retrain the model
+        train_crop_model(crop_name, crop_data)
+        
+        # Reload the models
+        global models, thresholds, future_predictions, crop_names
+        models, thresholds, future_predictions, crop_names = load_models()
+        
+        session['admin_message'] = f"Model for {crop_name} retrained successfully!"
+    except Exception as e:
+        session['admin_message'] = f"Error retraining model: {str(e)}"
+
+    return redirect(url_for('admin'))
 
 @app.route('/about')
 def about():

@@ -32,19 +32,23 @@
                 </div>
                 
                 <div class="crop-categories">
+                    {% set seen_crops = [] %}
                     {% for crop in crops %}
-                    <a href="#crop-form" class="crop-category-link" onclick="selectCrop('{{ crop }}')">
-                        <div class="crop-category" data-crop="{{ crop }}" data-category="{% if crop in ['Wheat', 'Barley', 'Paddy', 'Ragi'] %}cereals{% elif crop in ['Cotton'] %}fibers{% else %}others{% endif %}">
-                            <img src="{{ url_for('static', filename='images/' + crop.lower() + '.jpg') }}" alt="{{ crop }}" onerror="this.src='{{ url_for('static', filename='images/default-crop.jpg') }}'">
-                            <h4>{{ crop }}</h4>
-                            <p>{% if crop == 'Wheat' %}Winter cereal crop
-                               {% elif crop == 'Barley' %}Major cereal grain
-                               {% elif crop == 'Cotton' %}Soft fiber crop
-                               {% elif crop == 'Paddy' %}Rice in unhusked form
-                               {% elif crop == 'Ragi' %}Finger millet
-                               {% else %}Agricultural crop{% endif %}</p>
-                        </div>
-                    </a>
+                        {% if crop not in seen_crops %}
+                            {% set _ = seen_crops.append(crop) %}
+                            <a href="#crop-form" class="crop-category-link" onclick="selectCrop('{{ crop }}')">
+                                <div class="crop-category" data-crop="{{ crop }}" data-category="{% if crop in ['Wheat', 'Barley', 'Paddy', 'Ragi'] %}cereals{% elif crop in ['Cotton'] %}fibers{% else %}others{% endif %}">
+                                    <img src="{{ url_for('static', filename='images/' + crop.lower() + '.jpg') }}" alt="{{ crop }}" onerror="this.src='{{ url_for('static', filename='images/default-crop.jpg') }}'">
+                                    <h4>{{ crop }}</h4>
+                                    <p>{% if crop == 'Wheat' %}Winter cereal crop
+                                       {% elif crop == 'Barley' %}Major cereal grain
+                                       {% elif crop == 'Cotton' %}Soft fiber crop
+                                       {% elif crop == 'Paddy' %}Rice in unhusked form
+                                       {% elif crop == 'Ragi' %}Finger millet
+                                       {% else %}Agricultural crop{% endif %}</p>
+                                </div>
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </div>
                 
