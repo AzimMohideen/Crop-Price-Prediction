@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Crop Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Crop Price Predictor</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/admin" class="active">Admin</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section class="admin-panel">
+                <h2>Model Retraining</h2>
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="crop">Select Crop to Retrain:</label>
+                        <select name="crop" id="crop" required>
+                            {% for crop in crops %}
+                                <option value="{{ crop }}">{{ crop|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn">Retrain Model</button>
+                </form>
+                
+                {% if message %}
+                <div class="message">
+                    {{ message }}
+                </div>
+                {% endif %}
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 Crop Price Predictor | Agricultural Price Forecasting System</p>
+        </footer>
+    </div>
+</body>
+</html> 

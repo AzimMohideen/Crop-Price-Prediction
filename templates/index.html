@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Crop Price Predictor</h1>
+            <nav>
+                <ul>
+                    <li><a href="/" {% if request.path == '/' %}class="active"{% endif %}>Home</a></li>
+                    <li><a href="/about" {% if request.path == '/about' %}class="active"{% endif %}>About</a></li>
+                    <li><a href="/admin" {% if request.path == '/admin' %}class="active"{% endif %}>Admin</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section class="prediction-form">
+                <h2>Select a Crop to Predict Price</h2>
+                
+                <div class="category-pills">
+                    <div class="category-pill active" data-category="all">All Crops</div>
+                    <div class="category-pill" data-category="cereals">Cereals</div>
+                    <div class="category-pill" data-category="fibers">Fibers</div>
+                    <div class="category-pill" data-category="others">Others</div>
+                </div>
+                
+                <div class="crop-categories">
+                    {% for crop in crops %}
+                    <a href="#crop-form" class="crop-category-link" onclick="selectCrop('{{ crop }}')">
+                        <div class="crop-category" data-crop="{{ crop }}" data-category="{% if crop in ['Wheat', 'Barley', 'Paddy', 'Ragi'] %}cereals{% elif crop in ['Cotton'] %}fibers{% else %}others{% endif %}">
+                            <img src="{{ url_for('static', filename='images/' + crop.lower() + '.jpg') }}" alt="{{ crop }}" onerror="this.src='{{ url_for('static', filename='images/default-crop.jpg') }}'">
+                            <h4>{{ crop }}</h4>
+                            <p>{% if crop == 'Wheat' %}Winter cereal crop
+                               {% elif crop == 'Barley' %}Major cereal grain
+                               {% elif crop == 'Cotton' %}Soft fiber crop
+                               {% elif crop == 'Paddy' %}Rice in unhusked form
+                               {% elif crop == 'Ragi' %}Finger millet
+                               {% else %}Agricultural crop{% endif %}</p>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                
+                <div id="crop-form" class="crop-form-container hidden">
+                    <div class="selected-crop-info">
+                        <h3>Predict Price for <span id="selected-crop-name">Crop</span></h3>
+                        <p id="crop-description">Enter rainfall and year to predict the price.</p>
+                    </div>
+                    
+                    <form method="POST" id="prediction-form">
+                        <input type="hidden" name="crop" id="selected-crop" value="">
+                        
+                        <div class="form-group">
+                            <label for="year">Prediction Year:</label>
+                            <select name="year" id="year">
+                                {% for year in years_range %}
+                                    <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="rainfall">Rainfall (mm):</label>
+                            <input type="number" name="rainfall" id="rainfall" min="0" step="0.1" required>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn">Predict Price</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
+            {% if prediction %}
+            <section class="results">
+                <h2>Prediction Results</h2>
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3>{{ request.form['crop']|capitalize }} Price Prediction for {{ prediction.year }}</h3>
+                        <span class="rainfall-badge {{ rainfall_category|lower }}">{{ rainfall_category }} Rainfall</span>
+                    </div>
+                    
+                    <div class="price-details">
+                        <p class="prediction">Predicted WPI: <span>{{ prediction.wpi|round(2) }}</span></p>
+                        <p class="prediction-quintal">Price per Quintal (100kg): <span>₹{{ prediction.per_quintal|round(2) }}</span></p>
+                        <p class="prediction-adjusted">With Inflation (11.03%): <span>₹{{ prediction.inflation_adjusted|round(2) }}</span></p>
+                    </div>
+                    
+                    <p class="confidence">Confidence Range: ₹{{ confidence_interval[0]|round(2) }} - ₹{{ confidence_interval[1]|round(2) }} per quintal</p>
+                    
+                    {% if price_change %}
+                    <p class="price-change">Price Trend: <span class="{{ 'increase' if 'above' in price_change else 'normal' }}">{{ price_change }}</span></p>
+                    {% endif %}
+                    
+                    <div class="result-explanation">
+                        <h4>What does this mean?</h4>
+                        {% if rainfall_category == "Excessive" and thresholds %}
+                        <p>The rainfall ({{ request.form['rainfall'] }}mm) is higher than normal (threshold: {{ thresholds.excessive_threshold|round(2) }}mm). This may lead to flooding or excess moisture, typically resulting in reduced crop yield and higher prices.</p>
+                        {% elif rainfall_category == "Deficient" and thresholds %}
+                        <p>The rainfall ({{ request.form['rainfall'] }}mm) is lower than normal (threshold: {{ thresholds.deficient_threshold|round(2) }}mm). This may lead to drought-like conditions, typically resulting in reduced crop yield and higher prices.</p>
+                        {% elif rainfall_category == "Normal" and thresholds %}
+                        <p>The rainfall ({{ request.form['rainfall'] }}mm) is within normal range ({{ thresholds.deficient_threshold|round(2) }}mm to {{ thresholds.excessive_threshold|round(2) }}mm). This typically results in good crop yield and stable prices.</p>
+                        {% else %}
+                        <p>The rainfall ({{ request.form['rainfall'] }}mm) is {{ rainfall_category|lower }}. This may affect crop yield and prices.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="/visualization/{{ request.form['crop'] }}" class="btn">View Detailed Analysis</a>
+                </div>
+            </section>
+            {% endif %}
+            
+            {% if error_message %}
+            <section class="error">
+                <div class="error-message">
+                    {{ error_message }}
+                </div>
+            </section>
+            {% endif %}
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 Crop Price Predictor | Agricultural Price Forecasting System</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Category filtering
+        const categoryPills = document.querySelectorAll('.category-pill');
+        const cropCategories = document.querySelectorAll('.crop-category');
+        
+        categoryPills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                // Update active pill
+                categoryPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                
+                const category = this.dataset.category;
+                
+                // Filter crop categories
+                cropCategories.forEach(crop => {
+                    const cropCategory = crop.dataset.category;
+                    const cropElement = crop.closest('.crop-category-link');
+                    
+                    if (category === 'all' || cropCategory === category) {
+                        cropElement.style.display = 'block';
+                    } else {
+                        cropElement.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Function to select a crop and show the form
+        function selectCrop(cropName) {
+            document.getElementById('selected-crop').value = cropName;
+            document.getElementById('selected-crop-name').textContent = cropName;
+            
+            // Set crop description
+            let description = "Enter rainfall and year to predict the price.";
+            if (cropName === 'Wheat') {
+                description = "Wheat is a cereal grain cultivated worldwide. Optimal rainfall: 450-650 mm.";
+            } else if (cropName === 'Barley') {
+                description = "Barley is a major cereal grain. Optimal rainfall: 400-500 mm.";
+            } else if (cropName === 'Cotton') {
+                description = "Cotton is a soft fiber crop. Optimal rainfall: 500-700 mm.";
+            } else if (cropName === 'Paddy') {
+                description = "Paddy refers to rice in its unhusked form. Optimal rainfall: 1000-1200 mm.";
+            } else if (cropName === 'Ragi') {
+                description = "Ragi (finger millet) is a cereal crop. Optimal rainfall: 500-900 mm.";
+            }
+            document.getElementById('crop-description').textContent = description;
+            
+            // Show the form
+            document.getElementById('crop-form').classList.remove('hidden');
+            
+            // Highlight the selected crop
+            cropCategories.forEach(crop => {
+                if (crop.dataset.crop === cropName) {
+                    crop.classList.add('selected');
+                } else {
+                    crop.classList.remove('selected');
+                }
+            });
+        }
+        
+        // Function to hide the form
+        function hideForm() {
+            document.getElementById('crop-form').classList.add('hidden');
+            cropCategories.forEach(crop => {
+                crop.classList.remove('selected');
+            });
+        }
+        
+        // Add animation to form elements
+        const formInputs = document.querySelectorAll('input, select');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-5px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html> 

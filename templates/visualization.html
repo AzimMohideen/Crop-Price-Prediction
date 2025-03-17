@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ crop_name|capitalize }} Price Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Crop Price Predictor</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/admin">Admin</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section class="visualization">
+                <div class="visualization-intro">
+                    <h2>Understanding {{ crop_name|capitalize }} Prices</h2>
+                    <p>This analysis shows how {{ crop_name|capitalize }} prices have changed over time and how they relate to rainfall patterns. Use these insights to understand market trends and make informed decisions.</p>
+                </div>
+                
+                <div class="visualization-card">
+                    <h3>Historical Price Trend</h3>
+                    <p class="viz-description">This graph shows how {{ crop_name|capitalize }} prices have changed over time. Look for seasonal patterns and long-term trends.</p>
+                    <div class="graph-container">
+                        {{ price_graph|safe }}
+                    </div>
+                </div>
+                
+                <div class="visualization-card">
+                    <h3>Rainfall vs Price Relationship</h3>
+                    <p class="viz-description">This graph shows the relationship between rainfall (bars) and prices (red line). Notice how prices often increase when rainfall is either too high or too low.</p>
+                    <div class="graph-container">
+                        {{ correlation_graph|safe }}
+                    </div>
+                </div>
+                
+                {% if prediction_guide %}
+                <div class="visualization-card">
+                    <h3>Price Prediction Guide</h3>
+                    <p class="viz-description">This scatter plot shows how rainfall affects prices. The vertical lines show thresholds for deficient and excessive rainfall. Points above the trend line indicate higher than expected prices.</p>
+                    <div class="graph-container">
+                        {{ prediction_guide|safe }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if importance_graph %}
+                <div class="visualization-card">
+                    <h3>What Affects {{ crop_name|capitalize }} Prices?</h3>
+                    <p class="viz-description">This chart shows which factors have the most influence on price predictions. Taller bars indicate more important factors.</p>
+                    <div class="graph-container">
+                        {{ importance_graph|safe }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="actions">
+                    <a href="/" class="btn">Back to Prediction</a>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 Crop Price Predictor | Agricultural Price Forecasting System</p>
+        </footer>
+    </div>
+</body>
+</html> 

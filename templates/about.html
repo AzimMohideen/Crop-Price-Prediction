@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Crop Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Crop Price Predictor</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about" class="active">About</a></li>
+                    <li><a href="/admin">Admin</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section class="about-section">
+                <h2>About This Project</h2>
+                
+                <div class="about-content">
+                    <div class="about-image">
+                        <img src="{{ url_for('static', filename='images/agri_field.png') }}" alt="Agriculture field">
+                    </div>
+                    
+                    <div class="about-text">
+                        <h3>What is Crop Price Predictor?</h3>
+                        <p>Crop Price Predictor is an innovative tool designed to help farmers, traders, and agricultural stakeholders predict crop prices based on rainfall patterns and historical data.</p>
+                        
+                        <h3>How It Works</h3>
+                        <p>Our system analyzes historical crop price data along with rainfall information to identify patterns and relationships. Using advanced machine learning algorithms, we can predict how changes in rainfall might affect crop prices in the future.</p>
+                        
+                        <div class="feature-cards">
+                            <div class="feature-card">
+                                <div class="feature-icon">📊</div>
+                                <h4>Price Prediction</h4>
+                                <p>Get accurate price forecasts for various crops based on rainfall data and historical trends.</p>
+                            </div>
+                            
+                            <div class="feature-card">
+                                <div class="feature-icon">🌧️</div>
+                                <h4>Rainfall Analysis</h4>
+                                <p>Understand how different rainfall conditions (normal, excessive, or deficient) affect crop prices.</p>
+                            </div>
+                            
+                            <div class="feature-card">
+                                <div class="feature-icon">📈</div>
+                                <h4>Detailed Visualization</h4>
+                                <p>View comprehensive graphs and charts showing historical price trends and rainfall correlations.</p>
+                            </div>
+                        </div>
+                        
+                        <h3>Why Use Crop Price Predictor?</h3>
+                        <ul class="benefits-list">
+                            <li><strong>For Farmers:</strong> Plan your planting and harvesting strategies based on predicted prices.</li>
+                            <li><strong>For Traders:</strong> Make informed decisions about buying and selling agricultural commodities.</li>
+                            <li><strong>For Policymakers:</strong> Understand market trends to develop effective agricultural policies.</li>
+                            <li><strong>For Researchers:</strong> Access valuable data on the relationship between climate factors and crop prices.</li>
+                        </ul>
+                        
+                        <h3>Supported Crops</h3>
+                        <p>Our system currently supports price prediction for several major crops including Wheat, Barley, Cotton, Paddy, and Ragi. We're continuously working to expand our database to include more crops.</p>
+                    </div>
+                </div>
+                
+                <div class="how-to-use">
+                    <h3>How to Use the Predictor</h3>
+                    
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Select a Crop</h4>
+                                <p>Choose from our selection of available crops on the home page.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Enter Rainfall Data</h4>
+                                <p>Input the expected rainfall in millimeters for your region.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Choose Prediction Year</h4>
+                                <p>Select the year for which you want to predict crop prices.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Get Your Prediction</h4>
+                                <p>View the predicted price along with confidence intervals and rainfall analysis.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-info">
+                    <h3>Contact Us</h3>
+                    <p>Have questions or suggestions? We'd love to hear from you!</p>
+                    <p>Email: <a href="mailto:info@croppriceprediction.com">info@croppriceprediction.com</a></p>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 Crop Price Predictor | Agricultural Price Forecasting System</p>
+        </footer>
+    </div>
+</body>
+</html> 
