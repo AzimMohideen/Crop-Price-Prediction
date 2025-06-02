@@ -38,7 +38,7 @@
                             {% set _ = seen_crops.append(crop) %}
                             <a href="#crop-form" class="crop-category-link" onclick="selectCrop('{{ crop }}')">
                                 <div class="crop-category" data-crop="{{ crop }}" data-category="{% if crop in ['Wheat', 'Barley', 'Paddy', 'Ragi'] %}cereals{% elif crop in ['Cotton'] %}fibers{% else %}others{% endif %}">
-                                    <img src="{{ url_for('static', filename='images/' + crop.lower() + '.jpg') }}" alt="{{ crop }}" onerror="this.src='{{ url_for('static', filename='images/default-crop.jpg') }}'">
+                                    <img src="{{ url_for('static', filename='images/' + crop.lower() + '.jpg') }}" alt="A field of {{ crop }} growing in an agricultural landscape under natural light, showing healthy plants in a calm rural environment" class="crop-image">
                                     <h4>{{ crop }}</h4>
                                     <p>{% if crop == 'Wheat' %}Winter cereal crop
                                        {% elif crop == 'Barley' %}Major cereal grain
@@ -205,6 +205,7 @@
                 }
             });
         }
+        //fwwjjfifjw
         
         // Function to hide the form
         function hideForm() {
