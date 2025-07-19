@@ -58,7 +58,7 @@ You can use this project as a standalone script, Jupyter notebook, or web applic
 Edit the configuration or script to suit your dataset paths and feature choices.
 
 ```bash
-python app.py
+python web_interface.py
 ```
 
 
@@ -67,7 +67,7 @@ python app.py
 1. Start the server:
 
 ```bash
-python app.py
+python web_interface.py
 ```
 
 2. Open [http://localhost:5000](http://localhost:5000) in your browser.
