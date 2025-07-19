@@ -127,4 +127,4 @@ Contributions are welcome! If you want to improve the model, code, or documentat
 
 This project is open-source. See the LICENSE file for more details.
 
-*Note: Update project-specific details as needed, including actual features, app usage, and model results depending on the content in your repository. For more inspiration, see similar repositories on crop price prediction models[^1][^2][^3].*
+
